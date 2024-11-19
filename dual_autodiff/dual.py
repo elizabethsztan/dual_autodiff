@@ -11,26 +11,38 @@ class Dual:
         return f"Dual(real={self.real}, dual={self.dual})"
     
     def __add__(self, other):
-        return Dual(self.real + other.real, self.dual + other.dual)
+        if isinstance (other, Dual):
+            return Dual(self.real + other.real, self.dual + other.dual)
+        else:
+            return Dual(self.real + other, self.dual)
 
     def __sub__(self, other):
-        return Dual(self.real - other.real, self.dual - other.dual)
+        if isinstance (other, Dual):
+            return Dual(self.real - other.real, self.dual - other.dual)
+        else:
+            return Dual(self.real - other, self.dual)
     
     def __mul__(self, other):
-        real_component = self.real * other.real
-        dual_component = self.real * other.dual + self.dual * other.real
-        return Dual(real_component, dual_component)
+        if isinstance (other, Dual):
+            real_component = self.real * other.real
+            dual_component = self.real * other.dual + self.dual * other.real
+            return Dual(real_component, dual_component)
+        else:
+            return Dual(self.real * other, self.dual * other)
 
     def __truediv__(self, other):
-        if other.real == 0:
-            raise ZeroDivisionError("Division by zero is not allowed.")
-        real_component = self.real / other.real
-        dual_component = (self.dual * other.real - self.real * other.dual) / (other.real * other.real)
-        return Dual(real_component, dual_component)
+        if isinstance (other, Dual):
+            if other.real == 0:
+                raise ZeroDivisionError("Division by zero is not allowed.")
+            real_component = self.real / other.real
+            dual_component = (self.dual * other.real - self.real * other.dual) / (other.real * other.real)
+            return Dual(real_component, dual_component)
+        else:
+            return Dual(self.real / other, self.dual / other)
 
     def sin(self):
         real_component = np.sin(self.real)
-        dual_component = np.cos(self.real) * self.dual
+        dual_component = np.cos(self.real) * self.dual 
         return Dual(real_component, dual_component)
 
     def cos(self):
@@ -40,7 +52,7 @@ class Dual:
 
     def tan(self):
         real_component = np.tan(self.real)
-        dual_component = np.tan(self.real) * self.dual / (np.cos(self.real) * np.cos(self.real))
+        dual_component = self.dual / (np.cos(self.real) * np.cos(self.real))
         return Dual(real_component, dual_component)
     
     def exp(self):
@@ -49,6 +61,8 @@ class Dual:
         return Dual(real_component, dual_component)
 
     def log(self):
+        if self.real <= 0:
+            raise ValueError("Logarithm is undefined for non-positive values.")
         real_component = np.log(self.real)
         dual_component = self.dual / self.real 
         return Dual(real_component, dual_component)
