@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: dual_autodiff
+Version: 0.1.0
+Summary: Dual_autodiff package
+Author-email: "Elizabeth S.Z. Tan" <eszt2@cam.ac.uk>
+License: MIT
+Keywords: dual autodiff
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.18.0
+Requires-Dist: matplotlib>=3.0.0
+
+# dual_autodiff
+
+Automatic differentiation.

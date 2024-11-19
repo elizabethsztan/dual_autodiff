@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+dual_autodiff/__init__.py
+dual_autodiff/dual.py
+dual_autodiff.egg-info/PKG-INFO
+dual_autodiff.egg-info/SOURCES.txt
+dual_autodiff.egg-info/dependency_links.txt
+dual_autodiff.egg-info/requires.txt
+dual_autodiff.egg-info/top_level.txt
