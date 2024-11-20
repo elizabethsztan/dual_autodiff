@@ -15,12 +15,17 @@ class Dual:
             return Dual(self.real + other.real, self.dual + other.dual)
         else:
             return Dual(self.real + other, self.dual)
+        
+    __radd__ = __add__ 
 
     def __sub__(self, other):
         if isinstance (other, Dual):
             return Dual(self.real - other.real, self.dual - other.dual)
         else:
             return Dual(self.real - other, self.dual)
+    
+    def __rsub__(self, other):
+        return Dual(other - self.real, self.dual)
     
     def __mul__(self, other):
         if isinstance (other, Dual):
@@ -74,4 +79,4 @@ y = Dual (4, 2)
 print(x)
 print(x.exp())
 print(x/y)
-#print(y+3)
+print(3-y)
