@@ -72,11 +72,17 @@ class Dual:
         dual_component = self.dual / self.real 
         return Dual(real_component, dual_component)
 
+    def sinh(self):
+        real_component = np.sinh(self.real)
+        dual_component = np.cosh(self.real) * self.dual
+        return Dual(real_component, dual_component)
 
+    def cosh(self):
+        real_component = np.cosh(self.real)
+        dual_component = np.sinh(self.real) * self.dual
+        return Dual(real_component, dual_component)
 
-x = Dual (9, 2)
-y = Dual (4, 2)
-print(x)
-print(x.exp())
-print(x/y)
-print(3-y)
+    def tanh(self):
+        real_component = np.tanh(self.real)
+        dual_component = self.dual / (np.cosh(self.real) ** np.cosh(self.real))
+        return Dual(real_component, dual_component)
