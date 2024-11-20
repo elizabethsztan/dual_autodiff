@@ -86,3 +86,23 @@ class Dual:
         real_component = np.tanh(self.real)
         dual_component = self.dual / (np.cosh(self.real) ** np.cosh(self.real))
         return Dual(real_component, dual_component)
+    
+    def arcsin(self):
+        if self.real < -1 or self.real > 1:
+            raise ValueError("arcsin is undefined for values outside [-1, 1].")
+        real_component = np.arcsin(self.real)
+        dual_component = self.dual / np.sqrt(1 - self.real * self.real)
+        return Dual(real_component, dual_component)
+
+    def arccos(self):
+        if self.real < -1 or self.real > 1:
+            raise ValueError("arccos is undefined for values outside [-1, 1].")
+        real_component = np.arccos(self.real)
+        dual_component = -self.dual / np.sqrt(1 - self.real * self.real)
+        return Dual(real_component, dual_component)
+
+    def arctan(self):
+        real_component = np.arctan(self.real)
+        dual_component = self.dual / (1 + self.real * self.real)
+        return Dual(real_component, dual_component)
+
