@@ -53,6 +53,11 @@ class Dual:
             return self.real == other.real and self.dual == other.dual
         return False
 
+    def __pow__(self, exponent):
+        real_component = self.real**exponent
+        dual_component = exponent * (self.real**(exponent - 1)) * self.dual
+        return Dual(real_component, dual_component)
+
     def sin(self):
         real_component = np.sin(self.real)
         dual_component = np.cos(self.real) * self.dual 
@@ -113,11 +118,6 @@ class Dual:
         real_component = np.arctan(self.real)
         dual_component = self.dual / (1 + self.real * self.real)
         return Dual(real_component, dual_component)
-    
-    def pow(self, exponent):
-        real_component = self.real**exponent
-        dual_component = exponent * (self.real**(exponent - 1)) * self.dual
-        return Dual(real_component, dual_component)
 
     def sqrt(self):
         if self.real < 0:
@@ -126,4 +126,5 @@ class Dual:
         dual_component = self.dual / (2 * np.sqrt(self.real))
         return Dual(real_component, dual_component)
 
-
+x = Dual (2, 3)
+print(x**2)
