@@ -1,2 +1,3 @@
-#Distribution and packaging
+#Cache directories
 *.egg-info
+__pycache__/
