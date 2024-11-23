@@ -1,4 +1,7 @@
 #Distribution / packaging
 build/
 *.egg-info
+
+#Caching
 __pycache__/
+.pytest_cache/
