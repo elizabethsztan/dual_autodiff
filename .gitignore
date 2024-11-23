@@ -1,3 +1,4 @@
-#Cache directories
+#Distribution / packaging
+build/
 *.egg-info
 __pycache__/
