@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Dict, Union
-from .tools import get_functions, remove_function
+from dual_autodiff.tools import get_functions, remove_function
 
 class Dual:
     """
