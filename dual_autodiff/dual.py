@@ -1,52 +1,72 @@
 import numpy as np
+from typing import Dict, Union
 
 class Dual:
-
-    def __init__(self, real_component, dual_component):
-
+    def __init__(self, real_component, dual_component: Dict[str, float]):
         self.real = real_component
-        self.dual = dual_component
+        self.dual = dual_component if isinstance(dual_component, dict) else {}
     
     def __repr__(self):
         return f"Dual(real={self.real}, dual={self.dual})"
     
     def __add__(self, other):
-        if isinstance (other, Dual):
-            return Dual(self.real + other.real, self.dual + other.dual)
+        if isinstance(other, Dual):
+            new_dual = self.dual.copy()
+            for var, val in other.dual.items():
+                new_dual[var] = new_dual.get(var, 0) + val
+            return Dual(self.real + other.real, new_dual)
         else:
-            return Dual(self.real + other, self.dual)
+            return Dual(self.real + other, self.dual.copy())
         
-    __radd__ = __add__ 
+    __radd__ = __add__
 
     def __sub__(self, other):
-        if isinstance (other, Dual):
-            return Dual(self.real - other.real, self.dual - other.dual)
+        if isinstance(other, Dual):
+            new_dual = self.dual.copy()
+            for var, val in other.dual.items():
+                new_dual[var] = new_dual.get(var, 0) - val
+            return Dual(self.real - other.real, new_dual)
         else:
-            return Dual(self.real - other, self.dual)
+            return Dual(self.real - other, self.dual.copy())
     
     def __rsub__(self, other):
-        return Dual(other - self.real, self.dual)
+        return Dual(other - self.real, {k: -v for k, v in self.dual.items()})
     
     def __mul__(self, other):
-        if isinstance (other, Dual):
-            real_component = self.real * other.real
-            dual_component = self.real * other.dual + self.dual * other.real
-            return Dual(real_component, dual_component)
+        if isinstance(other, Dual):
+            new_dual = {}
+            all_vars = set(self.dual.keys()) | set(other.dual.keys())
+            for var in all_vars:
+                new_dual[var] = (self.real * other.dual.get(var, 0) + 
+                                self.dual.get(var, 0) * other.real)
+            return Dual(self.real * other.real, new_dual)
         else:
-            return Dual(self.real * other, self.dual * other)
+            return Dual(self.real * other, 
+                       {k: v * other for k, v in self.dual.items()})
+
+    __rmul__ = __mul__  # Added this line to fix right multiplication
 
     def __truediv__(self, other):
-        if isinstance (other, Dual):
+        if isinstance(other, Dual):
             if other.real == 0:
                 raise ZeroDivisionError("Division by zero is not allowed.")
-            real_component = self.real / other.real
-            dual_component = (self.dual * other.real - self.real * other.dual) / (other.real * other.real)
-            return Dual(real_component, dual_component)
+            new_dual = {}
+            all_vars = set(self.dual.keys()) | set(other.dual.keys())
+            for var in all_vars:
+                new_dual[var] = (
+                    (self.dual.get(var, 0) * other.real - 
+                     self.real * other.dual.get(var, 0)) / 
+                    (other.real * other.real)
+                )
+            return Dual(self.real / other.real, new_dual)
         else:
-            return Dual(self.real / other, self.dual / other)
+            if other == 0:
+                raise ZeroDivisionError("Division by zero is not allowed.")
+            return Dual(self.real / other, 
+                       {k: v / other for k, v in self.dual.items()})
 
     def __neg__(self):
-        return Dual(-self.real, -self.dual)
+        return Dual(-self.real, {k: -v for k, v in self.dual.items()})
 
     def __eq__(self, other):
         if isinstance(other, Dual):
@@ -54,77 +74,66 @@ class Dual:
         return False
 
     def __pow__(self, exponent):
-        real_component = self.real**exponent
-        dual_component = exponent * (self.real**(exponent - 1)) * self.dual
-        return Dual(real_component, dual_component)
+        new_dual = {k: exponent * (self.real**(exponent - 1)) * v 
+                   for k, v in self.dual.items()}
+        return Dual(self.real**exponent, new_dual)
 
     def sin(self):
-        real_component = np.sin(self.real)
-        dual_component = np.cos(self.real) * self.dual 
-        return Dual(real_component, dual_component)
+        return Dual(np.sin(self.real),
+                   {k: v * np.cos(self.real) for k, v in self.dual.items()})
 
     def cos(self):
-        real_component = np.cos(self.real)
-        dual_component = - np.sin(self.real) * self.dual 
-        return Dual(real_component, dual_component)
+        return Dual(np.cos(self.real),
+                   {k: -v * np.sin(self.real) for k, v in self.dual.items()})
 
     def tan(self):
-        real_component = np.tan(self.real)
-        dual_component = self.dual / (np.cos(self.real) * np.cos(self.real))
-        return Dual(real_component, dual_component)
+        return Dual(np.tan(self.real),
+                   {k: v / (np.cos(self.real) * np.cos(self.real)) 
+                    for k, v in self.dual.items()})
     
     def exp(self):
-        real_component = np.exp(self.real)
-        dual_component = np.exp(self.real) * self.dual
-        return Dual(real_component, dual_component)
+        return Dual(np.exp(self.real),
+                   {k: v * np.exp(self.real) for k, v in self.dual.items()})
 
     def log(self):
         if self.real <= 0:
             raise ValueError("Logarithm is undefined for non-positive values.")
-        real_component = np.log(self.real)
-        dual_component = self.dual / self.real 
-        return Dual(real_component, dual_component)
+        return Dual(np.log(self.real),
+                   {k: v / self.real for k, v in self.dual.items()})
 
     def sinh(self):
-        real_component = np.sinh(self.real)
-        dual_component = np.cosh(self.real) * self.dual
-        return Dual(real_component, dual_component)
+        return Dual(np.sinh(self.real),
+                   {k: v * np.cosh(self.real) for k, v in self.dual.items()})
 
     def cosh(self):
-        real_component = np.cosh(self.real)
-        dual_component = np.sinh(self.real) * self.dual
-        return Dual(real_component, dual_component)
+        return Dual(np.cosh(self.real),
+                   {k: v * np.sinh(self.real) for k, v in self.dual.items()})
 
     def tanh(self):
-        real_component = np.tanh(self.real)
-        dual_component = self.dual / (np.cosh(self.real) ** np.cosh(self.real))
-        return Dual(real_component, dual_component)
+        return Dual(np.tanh(self.real),
+                   {k: v / (np.cosh(self.real) ** 2) for k, v in self.dual.items()})  # Fixed this line
     
     def arcsin(self):
         if self.real < -1 or self.real > 1:
             raise ValueError("arcsin is undefined for values outside [-1, 1].")
-        real_component = np.arcsin(self.real)
-        dual_component = self.dual / np.sqrt(1 - self.real * self.real)
-        return Dual(real_component, dual_component)
+        return Dual(np.arcsin(self.real),
+                   {k: v / np.sqrt(1 - self.real * self.real) 
+                    for k, v in self.dual.items()})
 
     def arccos(self):
         if self.real < -1 or self.real > 1:
             raise ValueError("arccos is undefined for values outside [-1, 1].")
-        real_component = np.arccos(self.real)
-        dual_component = -self.dual / np.sqrt(1 - self.real * self.real)
-        return Dual(real_component, dual_component)
+        return Dual(np.arccos(self.real),
+                   {k: -v / np.sqrt(1 - self.real * self.real) 
+                    for k, v in self.dual.items()})
 
     def arctan(self):
-        real_component = np.arctan(self.real)
-        dual_component = self.dual / (1 + self.real * self.real)
-        return Dual(real_component, dual_component)
+        return Dual(np.arctan(self.real),
+                   {k: v / (1 + self.real * self.real) 
+                    for k, v in self.dual.items()})
 
     def sqrt(self):
         if self.real < 0:
             raise ValueError("Square root is undefined for negative values.")
-        real_component = np.sqrt(self.real)
-        dual_component = self.dual / (2 * np.sqrt(self.real))
-        return Dual(real_component, dual_component)
-
-x = Dual (2, 3)
-print(x**2)
+        return Dual(np.sqrt(self.real),
+                   {k: v / (2 * np.sqrt(self.real)) for k, v in self.dual.items()})
