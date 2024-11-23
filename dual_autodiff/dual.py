@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Dict, Union
+from .tools import get_functions, remove_function
 
 class Dual:
     """
@@ -129,11 +130,16 @@ class Dual:
         dual_part = {k: real_part * np.log(other) * v 
                     for k, v in self.dual.items()}
         return Dual(real_part, dual_part)
+    
+    def __neg__(self):
+        """Handle negation (-x)."""
+        return Dual(-self.real, {k: -v for k, v in self.dual.items()})
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         if method != "__call__":
             return NotImplemented
 
+        implementations = get_functions()
         args = []
         dual_args = []
         for arg in inputs:
@@ -143,29 +149,6 @@ class Dual:
             else:
                 args.append(arg)
                 dual_args.append({})
-
-        implementations = {#COULD STORE THIS IN SEP FILE SO USER CAN IMPLEMENT THEIR OWN 
-            # Basic Trigonometric Functions
-            'sin': (np.sin, lambda x: np.cos(x)),
-            'cos': (np.cos, lambda x: -np.sin(x)),
-            'tan': (np.tan, lambda x: 1 / (np.cos(x)**2)),
-
-            # Hyperbolic Functions
-            'sinh': (np.sinh, lambda x: np.cosh(x)),
-            'cosh': (np.cosh, lambda x: np.sinh(x)),
-            'tanh': (np.tanh, lambda x: 1 / (np.cosh(x)**2)),
-
-            # Exponential and Logarithmic Functions
-            'exp': (np.exp, lambda x: np.exp(x)),
-            'log': (np.log, lambda x: 1 / x),
-            'sqrt': (np.sqrt, lambda x: 1 / (2 * np.sqrt(x))),
-
-            # Inverse Trigonometric Functions
-            'arcsin': (np.arcsin, lambda x: 1 / np.sqrt(1 - x**2)),
-            'arccos': (np.arccos, lambda x: -1 / np.sqrt(1 - x**2)),
-            'arctan': (np.arctan, lambda x: 1 / (1 + x**2))
-        }
-
 
         try:
             if ufunc is np.add:
