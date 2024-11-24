@@ -7,6 +7,16 @@ class Dual:
     Dual numbers class to compute derivatives or partial derivatives of functions.
     The dual component must be inputted as a dictionary to allow multiple components of the dual number.
     This allows easy computation of partial derivatives.
+
+    Example:
+        >>> from dual_autodiff import Dual
+        >>> x_dual = Dual (3, {'x': 1})
+        >>> def f(x):
+        >>>     return x ** 3
+        >>> print(f(x_dual).dual['x'])
+        12 #printed the derivative of the function at point x = x_dual.real
+    
+    For more examples please see the accompanying notebook dual_autodiff.ipynb.
     """
     def __init__(self, real_component: Union[float, int], dual_component: Dict[str, float]):
         """
