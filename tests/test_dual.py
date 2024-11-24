@@ -136,7 +136,7 @@ def test_dual_power():
     result = d ** d2
     assert pytest.approx(result.real) == 4.0
 
-    # Test power with negative base - be calculated due to log 
+    # Test power with negative base - cannot be calculated due to log 
     with pytest.raises(ValueError):
         result = Dual(-2.0, {'x': 1.0}) ** d2
 
@@ -151,8 +151,8 @@ def test_reverse_dual_power():
 
     # Test power with dual exponent and scalar base
     result = scalar ** d
-    assert result.real == pytest.approx(9.0)  # Real part: 3^2 = 9
-    assert result.dual['x'] == pytest.approx(19.775021196)  # Dual part: 9 * ln(3) * 2
+    assert result.real == pytest.approx(9.0)  
+    assert result.dual['x'] == pytest.approx(3**2 * np.log(3) * 2) 
 
     # Test power with zero scalar base - cannot be calculated due to log
     with pytest.raises(ValueError):
@@ -164,31 +164,92 @@ def test_reverse_dual_power():
 
 def test_numpy_functions():
     """
-    Test the base implementations.
+    Test all base implementations of numpy functions with dual numbers.
     """
-    d = Dual(np.pi/4, {'x': 1.0})
+    # Use pi/4 for trig functions (nice value) and 0.5 for others
+    d_trig = Dual(np.pi/4, {'x': 1.0})
+    d_other = Dual(0.5, {'x': 1.0})  # Better point for non-trig functions
 
-    # Test sine
-    result = np.sin(d)
+    # Trigonometric functions
+    # sin(x)
+    result = np.sin(d_trig)
     assert pytest.approx(result.real) == np.sin(np.pi/4)
     assert pytest.approx(result.dual['x']) == np.cos(np.pi/4)
 
-    # Test cosine
-    result = np.cos(d)
+    # cos(x)
+    result = np.cos(d_trig)
     assert pytest.approx(result.real) == np.cos(np.pi/4)
     assert pytest.approx(result.dual['x']) == -np.sin(np.pi/4)
 
-    # Test exponential
-    result = np.exp(d)
-    assert pytest.approx(result.real) == np.exp(np.pi/4)
-    assert pytest.approx(result.dual['x']) == np.exp(np.pi/4)
+    # tan(x)
+    result = np.tan(d_trig)
+    assert pytest.approx(result.real) == np.tan(np.pi/4)
+    assert pytest.approx(result.dual['x']) == 1/np.cos(np.pi/4)**2
+
+    # Hyperbolic functions
+    # sinh(x)
+    result = np.sinh(d_other)
+    assert pytest.approx(result.real) == np.sinh(0.5)
+    assert pytest.approx(result.dual['x']) == np.cosh(0.5)
+
+    # cosh(x)
+    result = np.cosh(d_other)
+    assert pytest.approx(result.real) == np.cosh(0.5)
+    assert pytest.approx(result.dual['x']) == np.sinh(0.5)
+
+    # tanh(x)
+    result = np.tanh(d_other)
+    assert pytest.approx(result.real) == np.tanh(0.5)
+    assert pytest.approx(result.dual['x']) == 1/np.cosh(0.5)**2
+
+    # Exponential and logarithmic functions
+    # exp(x)
+    result = np.exp(d_other)
+    assert pytest.approx(result.real) == np.exp(0.5)
+    assert pytest.approx(result.dual['x']) == np.exp(0.5)
+
+    # log(x)
+    result = np.log(d_other)
+    assert pytest.approx(result.real) == np.log(0.5)
+    assert pytest.approx(result.dual['x']) == 1/0.5
+
+    # sqrt(x)
+    result = np.sqrt(d_other)
+    assert pytest.approx(result.real) == np.sqrt(0.5)
+    assert pytest.approx(result.dual['x']) == 1/(2*np.sqrt(0.5))
+
+    # Inverse trigonometric functions
+    # Need to use smaller values for inverse trig functions to stay in domain
+    d_small = Dual(0.5, {'x': 1.0})  # 0.5 is safely within [-1,1]
+
+    # arcsin(x)
+    result = np.arcsin(d_small)
+    assert pytest.approx(result.real) == np.arcsin(0.5)
+    assert pytest.approx(result.dual['x']) == 1/np.sqrt(1 - 0.5**2)
+
+    # arccos(x)
+    result = np.arccos(d_small)
+    assert pytest.approx(result.real) == np.arccos(0.5)
+    assert pytest.approx(result.dual['x']) == -1/np.sqrt(1 - 0.5**2)
+
+    # arctan(x)
+    result = np.arctan(d_small)
+    assert pytest.approx(result.real) == np.arctan(0.5)
+    assert pytest.approx(result.dual['x']) == 1/(1 + 0.5**2)
 
 def test_dual_negation():
+    """
+    Test that negating a dual number inverts the sign on the real and 
+    dual components.
+    """
     d = Dual(2.0, {'x': 1.0, 'y': 2.0})
     result = -d
     assert result.real == -2.0
     assert result.dual == {'x': -1.0, 'y': -2.0}
 
 def test_dual_repr():
+    """
+    Test string representatation of the Dual class.
+    """
     d = Dual(2.0, {'x': 1.0})
     assert repr(d) == "Dual(real=2.0, dual={'x': 1.0})"
