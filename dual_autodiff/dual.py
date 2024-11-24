@@ -251,6 +251,9 @@ class Dual:
         Raises:
             ValueError: If `other` is non-positive (logarithm is undefined for non-positive bases).
         """
+        if other <= 0:
+            raise ValueError("Base must be positive to raise it to a Dual exponent.")
+        
         if not isinstance(other, (int, float)):
             return NotImplemented
         real_part = other ** self.real
