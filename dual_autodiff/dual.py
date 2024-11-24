@@ -8,15 +8,22 @@ class Dual:
     The dual component must be inputted as a dictionary to allow multiple components of the dual number.
     This allows easy computation of partial derivatives.
 
+    Args:
+        real_component (float): real component of dual number.
+        dual_component (Dict[str, float]): dual components.
+    
+    Raises:
+        TypeError: If `real_component` is not a number or `dual_component` is not a dictionary.
+
     Example:
         >>> from dual_autodiff import Dual
         >>> x_dual = Dual (3, {'x': 1})
         >>> def f(x):
         >>>     return x ** 3
-        >>> print(f(x_dual).dual['x'])
-        12 #printed the derivative of the function at point x = x_dual.real
+        >>> print('The derivative of f at x = 3 is: '(x_dual).dual['x'])
+        The derivative of f at x = 3 is: 12
     
-    For more examples please see the accompanying notebook dual_autodiff.ipynb.
+    For more examples please see the demo.
     """
     def __init__(self, real_component: Union[float, int], dual_component: Dict[str, float]):
         """
