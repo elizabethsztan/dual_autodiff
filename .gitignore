@@ -5,3 +5,7 @@ build/
 #Caching
 __pycache__/
 .pytest_cache/
+
+#Sphinx
+make.bat
+Makefile
