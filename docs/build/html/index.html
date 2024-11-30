@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Automatic Differentiation with dual_autodiff &#8212; dual_autodiff 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=8d563738"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Implementation and Features" href="implementation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="automatic-differentiation-with-dual-autodiff">
+<h1>Automatic Differentiation with dual_autodiff<a class="headerlink" href="#automatic-differentiation-with-dual-autodiff" title="Link to this heading">¶</a></h1>
+<p><em>Author</em>: <a class="reference external" href="https://github.com/elizabethsztan">Elizabeth S.Z. Tan</a></p>
+<p>This package handles automatic (analytic) differentiation and partial differentiation using dual numbers.
+It was created to work seamlessly with numerous NumPy functions and also allows the user to add their own functions to the tool_store.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
+<p>Please see the demo for a detailed demonstration of the package capabilities.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Implementation and Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#module-dual_autodiff.dual">Dual Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#module-dual_autodiff.tools">Tools Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demos/dual_autodiff.html">Demo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demos/dual_autodiff.html#Example:-differentiating-a-function">Example: differentiating a function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/dual_autodiff.html#Example:-partial-differentiation">Example: partial differentiation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/dual_autodiff.html#Example:-adding-custom-functions">Example: adding custom functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/dual_autodiff.html#Comparing-the-numerical-derivative-to-the-analytical-derivative">Comparing the numerical derivative to the analytical derivative</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<p>Check out the <a class="reference internal" href="demos/dual_autodiff.html"><span class="doc">Automatic differentiation with dual numbers</span></a> notebook for comprehensive examples and usage patterns.</p>
+</section>
+<section id="requirements-update-these">
+<h2>Requirements (update these)<a class="headerlink" href="#requirements-update-these" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>NumPy</p></li>
+<li><p>Python 3.7+</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">dual_autodiff</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Implementation and Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos/dual_autodiff.html">Demo</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="implementation.html" title="next chapter">Implementation and Features</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Elizabeth S.Z. Tan.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
