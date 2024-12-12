@@ -1,5 +1,9 @@
+[build-system]
+requires = ["setuptools", "Cython", "wheel", "numpy"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "dual_autodiff"
+name = "dual_autodiff_x"
 version = "0.1.0"
 description = "Dual_autodiff package"
 authors = [
@@ -9,5 +13,10 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.6"
 keywords = ["dual autodiff"]
+dependencies = [
+    "numpy>=1.18.0",
+    "matplotlib>=3.0.0"
+]
 
-dependencies = ["numpy>=1.18.0", "matplotlib>=3.0.0"]
+[tool.setuptools]
+packages = ["dual_autodiff_x"]
