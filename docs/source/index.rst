@@ -26,7 +26,8 @@ Please see the demo for a detailed demonstration of the package capabilities.
    :caption: Contents:
 
    implementation
-   Demo <demos/dual_autodiff>
+   Demo <demos/dual_autodiff_demo>
+   Cython analysis <demos/dual_autodiff_analysis>
 
 Examples
 --------
