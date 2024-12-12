@@ -37,6 +37,17 @@ def add_function(name: str, func: Callable[[float], float],
         name (str): name of the function
         func (Callable[[float], float]): the function implementation
         derivative (Callable[[float], float]): the function derivative implementation
+
+    Example:
+        >>> from dual_autodiff.tools import add_function
+        >>> def func (x):
+        >>>     return x**3
+        >>> def func_derivative (x):
+        >>>     return 3*x**2
+        >>> add_function ('x_cubed', func, func_derivative) #adds function to tool_store
+        >>> x_dual = Dual(2, {'x': 1})
+        >>> print('The derivative of x cubed at x = 2 is ', x_cubed(x_dual.dual['x']))
+        >>> The derivative of x cubed at x = 2 is 12.
     """
     base_implementations[name] = (func, derivative)
 
