@@ -54,12 +54,25 @@ def add_function(name: str, func: Callable[[float], float],
 def get_functions() -> tool_store:
     """
     Get the current implementations dictionary.
+
+    Example:
+        >>> add_function('x_cubed', func, func_derivative)
+        >>> print(list(get_functions().keys()))
+        >>> dict_keys(['sin', 'cos', 'tan', 'sinh', 'cosh', 'tanh', 'exp', 'log', 'sqrt', 'arcsin', 'arccos', 'arctan', 'x_cubed'])
     """
     return base_implementations.copy()
 
 def remove_function(name: str) -> None:
     """
     Remove a function from the implementation dictionary.
+
+    Example:
+        >>> add_function('x_cubed', func, func_derivative)
+        >>> print('Check if sigmoid in tools store before removal: ', 'x_cubed' in list(get_functions().keys()))
+        >>> Check if sigmoid in tools store before removal: True
+        >>> remove_function ('x_cubed')
+        >>> print('Check if sigmoid in tools store before removal: ', 'x_cubed' in list(get_functions().keys()))
+        >>> Check if sigmoid in tools store after removal: False
     """
     if name in base_implementations:
         del base_implementations[name]
