@@ -91,29 +91,6 @@ docker build -t dual-autodiff .
 docker run -it dual-autodiff
 ```
 
-## Development
-
-### Setting Up Development Environment
-
-1. Clone the repository:
-```bash
-git clone [repository-url]
-cd DUAL_AUTODIFF_PACKAGE
-```
-
-2. Create and activate a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or
-.\venv\Scripts\activate  # Windows
-```
-
-3. Install development dependencies:
-```bash
-pip install -r requirements-dev.txt
-```
-
 ### Running Tests
 There is a pytest suite available for the pure python package. 
 ```bash
