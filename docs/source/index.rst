@@ -31,7 +31,7 @@ Please see the demo for a detailed demonstration of the package capabilities.
 
 Examples
 --------
-Check out the :doc:`demos/dual_autodiff` notebook for comprehensive examples and usage patterns.
+Check out the :doc:`demos/dual_autodiff_demo` notebook for comprehensive examples and usage patterns.
 
 Requirements (update these)
 ---------------------------

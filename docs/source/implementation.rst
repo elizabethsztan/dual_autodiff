@@ -10,7 +10,7 @@ Dual Class
 
 Key Features:
 ~~~~~~~~~~~~~
-- Supports basic arithmetic operations (+, -, *, /)
+- Supports basic arithmetic operations (+, -, \*, /)
 - Compatible with NumPy functions
 - Handles partial derivatives
 - Supports array operations
