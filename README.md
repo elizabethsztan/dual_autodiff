@@ -97,7 +97,7 @@ There is a pytest suite available for the pure python package.
 # Test Python implementation
 cd python_package
 pytest tests/
-
+```
 
 ## License
 
