@@ -1,7 +1,11 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "dual_autodiff"
 version = "0.1.0"
-description = "Dual_autodiff package"
+description = "Pure Python implementation of dual_autodiff package"
 authors = [
     {name = "Elizabeth S.Z. Tan", email = "eszt2@cam.ac.uk"}
 ]
@@ -9,5 +13,17 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.6"
 keywords = ["dual autodiff"]
+dependencies = [
+    "numpy>=1.18.0",
+    "matplotlib>=3.0.0"
+]
 
-dependencies = ["numpy>=1.18.0", "matplotlib>=3.0.0"]
+[tool.setuptools]
+packages = ["dual_autodiff"]
+
+[tool.cibuildwheel]
+skip = "pp*"
+build = ["cp310-manylinux_x86_64", "cp311-manylinux_x86_64"]
+build-verbosity = 1
+test-command = "python -c 'import dual_autodiff'"
+manylinux-x86_64-image = "quay.io/pypa/manylinux2014_x86_64:latest"
