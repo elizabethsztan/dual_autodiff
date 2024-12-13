@@ -13,6 +13,7 @@ It was created to work seamlessly with numerous NumPy functions and also allows 
 
 Installation
 -------------
+From the root folder, dual_autodiff_package, run the following command in terminal to download the package.
 .. code-block:: bash
 
    pip install -e .
@@ -27,7 +28,7 @@ Please see the demo for a detailed demonstration of the package capabilities.
 
    implementation
    Demo <demos/dual_autodiff_demo>
-   Cython analysis <demos/dual_autodiff_analysis>
+   Cython Analysis <demos/dual_autodiff_analysis>
 
 Examples
 --------
