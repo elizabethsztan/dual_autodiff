@@ -43,7 +43,9 @@ cdef class Dual:
         else:
             return Dual(self.real + float(other), self.dual.copy())
     
-    __radd__ = __add__
+    def __radd__(self, other):
+        cdef double other_float = float(other)
+        return Dual(other_float + self.real, self.dual.copy())
 
     def __mul__(self, other):
         cdef dict new_dual
@@ -63,7 +65,10 @@ cdef class Dual:
             return Dual(self.real * other_float, 
                        {k: v * other_float for k, v in self.dual.items()})
     
-    __rmul__ = __mul__
+    def __rmul__(self, other):
+        cdef double other_float = float(other)
+        return Dual(other_float * self.real, 
+                   {k: v * other_float for k, v in self.dual.items()})
 
     def __sub__(self, other):
         cdef dict new_dual
@@ -79,7 +84,9 @@ cdef class Dual:
             return Dual(self.real - float(other), self.dual.copy())
     
     def __rsub__(self, other):
-        return Dual(float(other) - self.real, {k: -v for k, v in self.dual.items()})
+        cdef double other_float = float(other)
+        return Dual(other_float - self.real, 
+                   {k: -v for k, v in self.dual.items()})
 
     def __truediv__(self, other):
         cdef dict new_dual
@@ -108,10 +115,9 @@ cdef class Dual:
                        {k: v / other_float for k, v in self.dual.items()})
         
     def __rtruediv__(self, other):
-        cdef double other_float
+        cdef double other_float = float(other)
         if self.real == 0:
             raise ZeroDivisionError("Division by zero is not allowed.")
-        other_float = float(other)
         return Dual(other_float / self.real,
                    {k: -other_float * v / (self.real * self.real) 
                     for k, v in self.dual.items()})
