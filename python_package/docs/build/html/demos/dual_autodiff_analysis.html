@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cython Analysis &#8212; dual_autodiff 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Automatic differentiation with dual numbers" href="dual_autodiff_demo.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="Cython-Analysis">
+<h1>Cython Analysis<a class="headerlink" href="#Cython-Analysis" title="Link to this heading">¶</a></h1>
+<p>The dual_autodiff package has a Cythonized version called dual_autodiff_x. Let’s analyse the performances for both of the packages.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#import the required packages</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">dual_autodiff</span> <span class="kn">import</span> <span class="n">dual</span>
+<span class="kn">from</span> <span class="nn">dual_autodiff_x</span> <span class="kn">import</span> <span class="n">dual</span> <span class="k">as</span> <span class="n">dual_x</span>
+<span class="kn">from</span> <span class="nn">dual_autodiff.tools</span> <span class="kn">import</span> <span class="n">add_function</span>
+<span class="kn">from</span> <span class="nn">dual_autodiff_x.tools</span> <span class="kn">import</span> <span class="n">add_function</span> <span class="k">as</span> <span class="n">add_function_x</span>
+</pre></div>
+</div>
+</div>
+<p>First, let’s verify that the Cython and Python versions give us the same results.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Define the function and the partial derivatives with the same example in the demo</span>
+<span class="k">def</span> <span class="nf">fmv</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">x</span>
+
+<span class="k">def</span> <span class="nf">fmv_x</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="k">def</span> <span class="nf">fmv_y</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#define dual numbers x and y using both packages</span>
+
+<span class="n">py_x_dual</span> <span class="o">=</span> <span class="n">dual</span><span class="o">.</span><span class="n">Dual</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">cy_x_dual</span> <span class="o">=</span> <span class="n">dual_x</span><span class="o">.</span><span class="n">Dual</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">py_y_dual</span> <span class="o">=</span> <span class="n">dual</span><span class="o">.</span><span class="n">Dual</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">cy_y_dual</span> <span class="o">=</span> <span class="n">dual_x</span><span class="o">.</span><span class="n">Dual</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python partial derivative wrt x: f_x(x = 1, y = 2) = </span><span class="si">{</span><span class="n">fmv</span><span class="p">(</span><span class="n">py_x_dual</span><span class="p">,</span><span class="w"> </span><span class="n">py_y_dual</span><span class="p">)</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cython partial derivative wrt x: f_x(x = 1, y = 2) = </span><span class="si">{</span><span class="n">fmv</span><span class="p">(</span><span class="n">cy_x_dual</span><span class="p">,</span><span class="w"> </span><span class="n">cy_y_dual</span><span class="p">)</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python partial derivative wrt y: f_y(x = 1, y = 2) = </span><span class="si">{</span><span class="n">fmv</span><span class="p">(</span><span class="n">py_x_dual</span><span class="p">,</span><span class="w"> </span><span class="n">py_y_dual</span><span class="p">)</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cython partial derivative wrt y: f_y(x = 1, y = 2) = </span><span class="si">{</span><span class="n">fmv</span><span class="p">(</span><span class="n">cy_x_dual</span><span class="p">,</span><span class="w"> </span><span class="n">cy_y_dual</span><span class="p">)</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Python partial derivative wrt x: f_x(x = 1, y = 2) = 891.5193822974542
+Cython partial derivative wrt x: f_x(x = 1, y = 2) = 891.5193822974542
+Python partial derivative wrt y: f_y(x = 1, y = 2) = 298.812842311155
+Cython partial derivative wrt y: f_y(x = 1, y = 2) = 298.812842311155
+</pre></div></div>
+</div>
+<p>They give the exact same results.</p>
+<p>Test the speeds of the pure Python and Cython version of the package for different operations.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Define the sigmoid function - this will be used as the custom function</span>
+<span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sigmoid function implementation&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">sigmoid_derivative</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Derivative of sigmoid function&quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">s</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">benchmark_operation</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sizes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                       <span class="n">py_dual</span><span class="p">,</span> <span class="n">cy_dual</span><span class="p">,</span> <span class="n">num_trials</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Benchmark a specific operation for both Python and Cython implementations.</span>
+<span class="sd">    Includes testing of</span>
+<span class="sd">    - addition</span>
+<span class="sd">    - multiplication</span>
+<span class="sd">    - division</span>
+<span class="sd">    - powers</span>
+<span class="sd">    - sin</span>
+<span class="sd">    - cosh</span>
+<span class="sd">    - exp</span>
+<span class="sd">    - sigmoid (custom function)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">py_times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cy_times</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">:</span>
+        <span class="n">py_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cy_total</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_trials</span><span class="p">):</span>
+            <span class="n">x_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+
+            <span class="c1"># Python version timing</span>
+            <span class="n">py_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span> <span class="c1">#for different numbers of operations</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">py_dual</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
+                <span class="k">if</span> <span class="n">operation</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="s1">&#39;mul&#39;</span><span class="p">,</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span> <span class="s1">&#39;pow&#39;</span><span class="p">]:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">py_dual</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span> <span class="c1">#if involving another dual number - binary operation</span>
+                    <span class="k">if</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;add&#39;</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+                    <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;mul&#39;</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+                    <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;div&#39;</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span>
+                    <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;pow&#39;</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="n">y</span>
+                <span class="c1">#if does not involve another dual number - unary operation</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;sin&#39;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;cosh&#39;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;exp&#39;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;sigmoid&#39;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">py_total</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">py_start</span>
+
+            <span class="c1"># Cython version timing</span>
+            <span class="n">cy_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">cy_dual</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
+                <span class="k">if</span> <span class="n">operation</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="s1">&#39;mul&#39;</span><span class="p">,</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span> <span class="s1">&#39;pow&#39;</span><span class="p">]:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">cy_dual</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
+                    <span class="k">if</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;add&#39;</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+                    <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;mul&#39;</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+                    <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;div&#39;</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span>
+                    <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;pow&#39;</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="n">y</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;sin&#39;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;cosh&#39;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;exp&#39;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;sigmoid&#39;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">cy_total</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">cy_start</span>
+
+        <span class="c1">#save the times</span>
+        <span class="n">py_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py_total</span> <span class="o">/</span> <span class="n">num_trials</span><span class="p">)</span>
+        <span class="n">cy_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cy_total</span> <span class="o">/</span> <span class="n">num_trials</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">py_times</span><span class="p">,</span> <span class="n">cy_times</span>
+
+<span class="k">def</span> <span class="nf">run_benchmarks</span><span class="p">(</span><span class="n">py_dual</span><span class="p">,</span> <span class="n">cy_dual</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the benchmarks and plot&quot;&quot;&quot;</span>
+
+    <span class="c1"># Add the sigmoid function to both implementations</span>
+    <span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">,</span> <span class="n">sigmoid</span><span class="p">,</span> <span class="n">sigmoid_derivative</span><span class="p">)</span>
+    <span class="n">add_function_x</span><span class="p">(</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">,</span> <span class="n">sigmoid</span><span class="p">,</span> <span class="n">sigmoid_derivative</span><span class="p">)</span>
+
+    <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="s1">&#39;mul&#39;</span><span class="p">,</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span> <span class="s1">&#39;pow&#39;</span><span class="p">,</span> <span class="s1">&#39;sin&#39;</span><span class="p">,</span> <span class="s1">&#39;cosh&#39;</span><span class="p">,</span><span class="s1">&#39;exp&#39;</span><span class="p">,</span> <span class="s1">&#39;sigmoid&#39;</span><span class="p">]</span>
+    <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">50000</span><span class="p">]</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">op</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">operations</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="n">py_times</span><span class="p">,</span> <span class="n">cy_times</span> <span class="o">=</span> <span class="n">benchmark_operation</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">sizes</span><span class="p">,</span> <span class="n">py_dual</span><span class="p">,</span> <span class="n">cy_dual</span><span class="p">)</span>
+
+        <span class="c1"># Calculate speedup</span>
+        <span class="n">speedups</span> <span class="o">=</span> <span class="p">[</span><span class="n">py</span><span class="o">/</span><span class="n">cy</span> <span class="k">for</span> <span class="n">py</span><span class="p">,</span> <span class="n">cy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">py_times</span><span class="p">,</span> <span class="n">cy_times</span><span class="p">)]</span>
+
+        <span class="c1"># Plot timing comparison</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">py_times</span><span class="p">,</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Python&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">cy_times</span><span class="p">,</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Cython&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s1"> Operation</span><span class="se">\n</span><span class="s1">Max Speedup: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">speedups</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">x&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Input Size&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Time (seconds)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+        <span class="c1"># Log scale</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plt</span>
+
+<span class="c1">#Analyse how much memory it takes to store a dual number for python and cython version</span>
+<span class="k">def</span> <span class="nf">analyse_memory_usage</span><span class="p">(</span><span class="n">py_dual</span><span class="p">,</span> <span class="n">cy_dual</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Analyse memory usage&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+
+    <span class="c1">#Create random number</span>
+    <span class="n">x_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span>
+
+    <span class="c1">#create dual numbers</span>
+    <span class="n">py_dual</span> <span class="o">=</span> <span class="n">py_dual</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
+    <span class="n">cy_dual</span> <span class="o">=</span> <span class="n">cy_dual</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">py_dual</span><span class="p">),</span> <span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">cy_dual</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run benchmarks</span>
+<span class="n">plt</span> <span class="o">=</span> <span class="n">run_benchmarks</span><span class="p">(</span><span class="n">dual</span><span class="o">.</span><span class="n">Dual</span><span class="p">,</span> <span class="n">dual_x</span><span class="o">.</span><span class="n">Dual</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;dual_benchmarks.png&#39;</span><span class="p">)</span>
+
+<span class="c1"># Check memory usage</span>
+<span class="n">py_size</span><span class="p">,</span> <span class="n">cy_size</span> <span class="o">=</span> <span class="n">analyse_memory_usage</span><span class="p">(</span><span class="n">dual</span><span class="o">.</span><span class="n">Dual</span><span class="p">,</span> <span class="n">dual_x</span><span class="o">.</span><span class="n">Dual</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Memory usage per object: Python=</span><span class="si">{</span><span class="n">py_size</span><span class="si">}</span><span class="s2"> bytes, Cython=</span><span class="si">{</span><span class="n">cy_size</span><span class="si">}</span><span class="s2"> bytes&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Memory usage per object: Python=48 bytes, Cython=56 bytes
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/demos_dual_autodiff_analysis_8_1.png" src="../_images/demos_dual_autodiff_analysis_8_1.png" />
+</div>
+</div>
+<div class="line-block">
+<div class="line">We can see that the Cython package is fast than the Python package for all of these operations.</div>
+<div class="line">It takes more memory, however, to store a dual number using the Cython package as opposed to the Python package.</div>
+</div>
+<p>Now, let’s analyse the speeds for partial differentiation with the same example as in the demo notebook.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">benchmark_partial_derivatives</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">num_trials</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Benchmark partial derivative computation for both implementations</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sizes: List of input sizes to test</span>
+<span class="sd">        num_trials: Number of trials for each size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">py_times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cy_times</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">fmv</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">x</span>
+
+    <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">:</span>
+        <span class="n">py_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cy_total</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Generate random points for testing</span>
+        <span class="n">x_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_trials</span><span class="p">):</span>
+            <span class="c1"># Python version timing</span>
+            <span class="n">py_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">x_dual</span> <span class="o">=</span> <span class="n">dual</span><span class="o">.</span><span class="n">Dual</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+                <span class="n">y_dual</span> <span class="o">=</span> <span class="n">dual</span><span class="o">.</span><span class="n">Dual</span><span class="p">(</span><span class="n">y_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">fmv</span><span class="p">(</span><span class="n">x_dual</span><span class="p">,</span> <span class="n">y_dual</span><span class="p">)</span>
+                <span class="n">dx</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+                <span class="n">dy</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+            <span class="n">py_total</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">py_start</span>
+
+            <span class="c1"># Cython version timing</span>
+            <span class="n">cy_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">x_dual</span> <span class="o">=</span> <span class="n">dual_x</span><span class="o">.</span><span class="n">Dual</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+                <span class="n">y_dual</span> <span class="o">=</span> <span class="n">dual_x</span><span class="o">.</span><span class="n">Dual</span><span class="p">(</span><span class="n">y_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">fmv</span><span class="p">(</span><span class="n">x_dual</span><span class="p">,</span> <span class="n">y_dual</span><span class="p">)</span>
+                <span class="n">dx</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+                <span class="n">dy</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+            <span class="n">cy_total</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">cy_start</span>
+
+        <span class="n">py_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py_total</span> <span class="o">/</span> <span class="n">num_trials</span><span class="p">)</span>
+        <span class="n">cy_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cy_total</span> <span class="o">/</span> <span class="n">num_trials</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">py_times</span><span class="p">,</span> <span class="n">cy_times</span>
+
+<span class="k">def</span> <span class="nf">run_partial_derivative_benchmark</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create performance comparison plot&quot;&quot;&quot;</span>
+    <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">50000</span><span class="p">]</span>
+    <span class="n">py_times</span><span class="p">,</span> <span class="n">cy_times</span> <span class="o">=</span> <span class="n">benchmark_partial_derivatives</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span>
+
+    <span class="c1"># Calculate speedup</span>
+    <span class="n">speedups</span> <span class="o">=</span> <span class="p">[</span><span class="n">py</span><span class="o">/</span><span class="n">cy</span> <span class="k">for</span> <span class="n">py</span><span class="p">,</span> <span class="n">cy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">py_times</span><span class="p">,</span> <span class="n">cy_times</span><span class="p">)]</span>
+
+    <span class="c1"># Create the plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="c1"># Plot timing comparison</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">py_times</span><span class="p">,</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Python&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">cy_times</span><span class="p">,</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Cython&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Add labels and title</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Partial Derivatives Performance Comparison</span><span class="se">\n</span><span class="s1">Max Speedup: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">speedups</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">x&#39;</span><span class="p">,</span>
+              <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Number of Evaluations&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Time (seconds)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+    <span class="c1"># Add grid and legend</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+    <span class="c1"># Use log scale for both axes</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plt</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create and save the performance comparison plot</span>
+<span class="n">plt</span> <span class="o">=</span> <span class="n">run_partial_derivative_benchmark</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;partial_derivatives_benchmark.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/demos_dual_autodiff_analysis_12_0.png" src="../_images/demos_dual_autodiff_analysis_12_0.png" />
+</div>
+</div>
+<p>The Cython version can be almost doubly as fast as the Python version.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">dual_autodiff</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation and Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dual_autodiff_demo.html">Demo</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Cython Analysis</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="dual_autodiff_demo.html" title="previous chapter">Automatic differentiation with dual numbers</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Elizabeth S.Z. Tan.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/demos/dual_autodiff_analysis.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
