@@ -6,10 +6,6 @@ doctrees/
 __pycache__/
 .pytest_cache/
 
-#Sphinx
-make.bat
-Makefile
-
 #Cythonized package install files 
 *.cpp
 *.pyd
