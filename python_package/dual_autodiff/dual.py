@@ -20,7 +20,7 @@ class Dual:
         >>> x_dual = Dual (3, {'x': 1})
         >>> def f(x):
         >>>     return x ** 3
-        >>> print('The derivative of f at x = 3 is: '(x_dual).dual['x'])
+        >>> print('The derivative of f at x = 3 is: 'f(x_dual).dual['x'])
         The derivative of f at x = 3 is: 12
     
     For more examples please see the demo.

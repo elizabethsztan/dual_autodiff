@@ -61,7 +61,7 @@ This allows easy computation of partial derivatives.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x_dual</span> <span class="o">=</span> <span class="n">Dual</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The derivative of f at x = 3 is: &#39;</span><span class="p">(</span><span class="n">x_dual</span><span class="p">)</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The derivative of f at x = 3 is: &#39;</span><span class="n">f</span><span class="p">(</span><span class="n">x_dual</span><span class="p">)</span><span class="o">.</span><span class="n">dual</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
 <span class="go">The derivative of f at x = 3 is: 12</span>
 </pre></div>
 </div>

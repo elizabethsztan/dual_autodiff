@@ -10,13 +10,18 @@ Automatic Differentiation with dual_autodiff
 
 This package handles automatic (analytic) differentiation and partial differentiation using dual numbers. 
 It was created to work seamlessly with numerous NumPy functions and also allows the user to add their own functions to the tool_store.
+There are two packages available with the exact same functionality - a pure Python package (dual_autodiff) and a Cython package (dual_autodiff_x).
+The Cython package handles operations faster. 
 
 Installation
 -------------
-From the root folder, dual_autodiff_package, run the following command in terminal to download the package.
+To install the pure Python package, go to the root folder, python_package, run the following command in terminal to download the package.
+
 .. code-block:: bash
 
    pip install -e .
+
+To install the Cython package, go to the Cython root folder, cython_package, and run the same command.
 
 Quick Start
 -----------
@@ -33,8 +38,9 @@ Please see the demo for a detailed demonstration of the package capabilities.
 Examples
 --------
 Check out the :doc:`demos/dual_autodiff_demo` notebook for comprehensive examples and usage patterns.
+To see a comparison between the Cython and Python version of the package, please go to :doc:`demos/dual_autodiff_analysis`.
 
-Requirements (update these)
+Requirements
 ---------------------------
 - NumPy
 - Python 3.7+

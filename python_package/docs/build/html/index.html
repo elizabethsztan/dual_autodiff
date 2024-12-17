@@ -39,14 +39,16 @@
 <h1>Automatic Differentiation with dual_autodiff<a class="headerlink" href="#automatic-differentiation-with-dual-autodiff" title="Link to this heading">¶</a></h1>
 <p><em>Author</em>: <a class="reference external" href="https://github.com/elizabethsztan">Elizabeth S.Z. Tan</a></p>
 <p>This package handles automatic (analytic) differentiation and partial differentiation using dual numbers.
-It was created to work seamlessly with numerous NumPy functions and also allows the user to add their own functions to the tool_store.</p>
+It was created to work seamlessly with numerous NumPy functions and also allows the user to add their own functions to the tool_store.
+There are two packages available with the exact same functionality - a pure Python package (dual_autodiff) and a Cython package (dual_autodiff_x).
+The Cython package handles operations faster.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
-<p>From the root folder, dual_autodiff_package, run the following command in terminal to download the package.
-.. code-block:: bash</p>
-<blockquote>
-<div><p>pip install -e .</p>
-</div></blockquote>
+<p>To install the pure Python package, go to the root folder, python_package, run the following command in terminal to download the package.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+<p>To install the Cython package, go to the Cython root folder, cython_package, and run the same command.</p>
 </section>
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
@@ -72,10 +74,11 @@ It was created to work seamlessly with numerous NumPy functions and also allows 
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
-<p>Check out the <a class="reference internal" href="demos/dual_autodiff_demo.html"><span class="doc">Automatic differentiation with dual numbers</span></a> notebook for comprehensive examples and usage patterns.</p>
+<p>Check out the <a class="reference internal" href="demos/dual_autodiff_demo.html"><span class="doc">Automatic differentiation with dual numbers</span></a> notebook for comprehensive examples and usage patterns.
+To see a comparison between the Cython and Python version of the package, please go to <a class="reference internal" href="demos/dual_autodiff_analysis.html"><span class="doc">Cython Analysis</span></a>.</p>
 </section>
-<section id="requirements-update-these">
-<h2>Requirements (update these)<a class="headerlink" href="#requirements-update-these" title="Link to this heading">¶</a></h2>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>NumPy</p></li>
 <li><p>Python 3.7+</p></li>
