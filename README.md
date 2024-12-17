@@ -38,19 +38,6 @@ DUAL_AUTODIFF_PACKAGE/
 └── README.md               # This file
 ```
 
-## Documentation
-
-The documentation can be found in the prebuilt HTML files in the `python_package/docs/` directory. 
-
-To rebuild the documentation:
-1. Navigate to the `python_package/docs/` directory
-2. Run the following commands:
-```bash
-make.bat clean   # Clean existing build
-make.bat html    # Build new HTML documentation
-```
-The newly built documentation will be available in `python_package/docs/build/html/`.
-
 ## Choosing an Implementation
 
 ### Python Package (`python_package/`)
@@ -87,9 +74,42 @@ cd cython_package
 pip install -e .
 ```
 
+## Requirements 
+The requirement files are located in the `requirements/` directory. If you want to contribute to the development of the package, please run 
+
+```bash
+cd requirements
+pip install -r requirements.txt
+pip install -r requirements_dev.txt
+```
+
+in your virtual environment to download the required dependencies.
+If you want to rebuild Sphinx documentation, please download Pandoc, as this cannot be downloaded through pip. 
+For a `conda` virtual environment
+
+```bash
+
+conda install -c conda-forge pandoc
+
+```
+
+## Documentation
+
+The documentation can be found in the prebuilt HTML files in the `python_package/docs/` directory. 
+
+To rebuild the documentation:
+1. Navigate to the `python_package/docs/` directory
+2. Run the following commands:
+```bash
+make.bat clean   # Clean existing build
+make.bat html    # Build new HTML documentation
+```
+The newly built documentation will be available in `python_package/docs/build/html/`.
+
+
 ### Using Docker
 
-The `Docker_testing/` directory contains all necessary files for running the package in a containerized environment:
+The `Docker_testing/` directory contains all necessary files for running the package in a containerised environment:
 ```bash
 cd Docker_testing
 docker build -t dual-autodiff .
