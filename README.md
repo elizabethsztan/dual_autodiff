@@ -118,6 +118,7 @@ docker run -it dual-autodiff
 
 ### Running Tests
 There is a pytest suite available for the pure python package. 
+
 ```bash
 # Test Python implementation
 cd python_package
