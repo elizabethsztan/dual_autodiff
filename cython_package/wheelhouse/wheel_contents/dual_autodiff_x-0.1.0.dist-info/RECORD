@@ -1,0 +1,11 @@
+dual_autodiff_x-0.1.0.dist-info/WHEEL,sha256=m2_gJPr7xnnGfiE013tVzgC-Sc1sFXYskwf7kyqFHXk,151
+dual_autodiff_x-0.1.0.dist-info/RECORD,,
+dual_autodiff_x-0.1.0.dist-info/METADATA,sha256=5N3h7SfLxjWZmeX9nF5jlA4xQhrJy0TpJD2PFnvA8uY,305
+dual_autodiff_x-0.1.0.dist-info/top_level.txt,sha256=EWALXRSdadhQpj-fKjg0KbhKfgUdRlG2zNhN89Hpy_M,16
+dual_autodiff_x/__init__.py,sha256=Lo5l6W09FPlqgsGptWfIE7Zs24F8jmGM5xGJypNMXDQ,44
+dual_autodiff_x/tools.cpp,sha256=3WnIMtSfeY_14UDWpoOU8rDFIDRWFUtHX3EKm7mIS1w,506568
+dual_autodiff_x/dual.cpython-310-x86_64-linux-gnu.so,sha256=9JvEupTN1VtKNczMuDuShdBaobaAIWcOrTPI8qM7oEo,1393720
+dual_autodiff_x/tools.cp313-win_amd64.pyd,sha256=1P-kOFuR8hGsbpzj0hE2wlaXXtnZD6g6SiAWZVJ2dtY,57856
+dual_autodiff_x/tools.cpython-310-x86_64-linux-gnu.so,sha256=rL_Ja6pw9Vy6GMpcKXrrqJeDAdIpzLDEy4KIPCUFBqE,513664
+dual_autodiff_x/dual.cp313-win_amd64.pyd,sha256=_X4wtKSc_OEo76_ITGCj9_Dj18XKAeFJj1Im1_Rvi-U,129536
+dual_autodiff_x/dual.cpp,sha256=amA9sTj_V3LbE-nYYsyos-wy2ibQ0CdU9Bw1GpyN3n4,806389
