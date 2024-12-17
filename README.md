@@ -30,6 +30,11 @@ DUAL_AUTODIFF_PACKAGE/
 │   ├── setup.py
 │   └── README.md
 │
+├── requirements/          # Requirements file
+│   ├── requirements_dev.txt      # External dependencies used in development
+│   ├── requirements.txt          # Minimal external dependencies
+│   └── requirements_full.txt     # Comprehensive dependencies
+│
 └── README.md               # This file
 ```
 
