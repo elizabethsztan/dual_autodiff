@@ -21,6 +21,9 @@ Specifically
 - Static typing .pyx files
 - Making the README.md template 
 - Formatting the .rst files for Sphinx documentation
+- Creation of Dockerfile
+
+All of the other part of the code did not use these tools.
 
 ### Example Prompts Used
 - "ERROR MESSAGE What is wrong with my code?"
