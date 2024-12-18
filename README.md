@@ -1,6 +1,6 @@
 # DUAL_AUTODIFF_PACKAGE
 
-A dual number implementation for automatic differentiation, available in both Pure Python and Cython packages. This repository provides optimized implementations suitable for both educational purposes and production environments.
+A dual number implementation for automatic differentiation, available in both Pure Python and Cython packages. This repository provides optimised implementations suitable for both educational purposes and production environments.
 
 ## LLM Usage
 
@@ -67,11 +67,11 @@ DUAL_AUTODIFF_PACKAGE/
   - Learning and educational purposes
   - Small to medium-scale computations
   - Environments where installation simplicity is priority
-  - Projects prioritizing code readability
+  - Projects prioritising code readability
 
 ### Cython Package (`cython_package/`)
 - High-performance implementation
-- Optimized for production use
+- Optimised for production use
 - Ideal for:
   - Large-scale numerical computations
   - Production environments
