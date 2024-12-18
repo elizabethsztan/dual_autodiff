@@ -14,7 +14,13 @@ All algorithms were implemented independently. LLMs were primarily utilised for:
 - Bug fixing support
 - Code commenting and docstrings
 
-In particular, I used Claude to static type my .pyx files when Cythonising the package and add dosctrings to the original package. Claude was also used to make the README.md template.
+Specifically
+- Code prototyping for the pytest suite
+- Parsing error messages throughout the whole project
+- Adding docstring templates to functions 
+- Static typing .pyx files
+- Making the README.md template 
+- Formatting the .rst files for Sphinx documentation
 
 ### Example Prompts Used
 - "ERROR MESSAGE What is wrong with my code?"
