@@ -2,6 +2,26 @@
 
 A dual number implementation for automatic differentiation, available in both Pure Python and Cython packages. This repository provides optimized implementations suitable for both educational purposes and production environments.
 
+## LLM Usage
+
+This project was developed with supportive use of Large Language Models (LLMs):
+
+- **Models Used**: Claude 3.5 Sonnet and ChatGPT 4.0
+
+### Development Process
+All algorithms were implemented independently. LLMs were primarily utilised for:
+- Plotting assistance 
+- Bug fixing support
+- Code commenting and docstrings
+
+In particular, I used Claude to static type my .pyx files when Cythonising the package and add dosctrings to the original package. Claude was also used to make the README.md template.
+
+### Example Prompts Used
+- "ERROR MESSAGE What is wrong with my code?"
+- "What tests should I implement for my dual class?"
+- "Add docstrings to this function."
+- "Please add static typing so we can Cythonise the package."
+
 ## Repository Structure
 
 ```
